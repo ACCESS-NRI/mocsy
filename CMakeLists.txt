@@ -34,7 +34,7 @@ add_subdirectory(src)
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/mocsy.pc.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/MOCSY.pc"
+  "${CMAKE_CURRENT_BINARY_DIR}/mocsy.pc"
   @ONLY
 )
 
@@ -45,7 +45,7 @@ install(TARGETS MOCSY
   ARCHIVE DESTINATION lib
 )
 
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/MOCSY.pc"
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mocsy.pc"
   DESTINATION lib/pkgconfig
 )
 
