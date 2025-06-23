@@ -1,0 +1,11 @@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+
+Name: mocsy
+Description: Routines to model ocean carbonate system thermodynamics
+Version: @PROJECT_VERSION@
+Libs: -L${libdir} -lmocsy
+Cflags: -I${includedir}
+
