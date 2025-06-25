@@ -33,7 +33,7 @@ jobs:
       - name: Execute cmake and build for ${{matrix.compiler}}
         shell: bash -el {0}
         run: |
-          conda activate pic
+          conda activate mocsy-access-nri
           export FC=${{matrix.compiler}}
           cmake -B build
           cmake --build build
