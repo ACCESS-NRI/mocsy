@@ -1,5 +1,5 @@
 macro(configure_fortran_flags)
-  if(CMAKE_Fortran_COMPILER_ID MATCHES "GNU")
+  if("${CMAKE_Fortran_COMPILER_ID}" STREQUAL "GNU")
 
     message(STATUS "Configuring Fortran flags for GNU")
 
@@ -20,7 +20,7 @@ macro(configure_fortran_flags)
     set(CMAKE_Fortran_FLAGS_RELWITHDEBINFO "-g")
     set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -g -W -fbounds-check")
 
-  elseif(CMAKE_Fortran_COMPILER_ID STREQUAL "Intel" OR CMAKE_Fortran_COMPILER_ID STREQUAL "IntelLLVM")
+  elseif("${CMAKE_Fortran_COMPILER_ID}" STREQUAL "INTEL" OR "${CMAKE_Fortran_COMPILER_ID}" STREQUAL "IntelLLVM")
 
     message(STATUS "Configuring Fortran flags for Intel/IntelLLVM")
 

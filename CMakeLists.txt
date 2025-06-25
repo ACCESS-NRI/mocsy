@@ -12,10 +12,6 @@ else()
   message(STATUS "Setting build type to ${CMAKE_BUILD_TYPE}")
 endif()
 
-if(NOT CMAKE_Fortran_COMPILER_ID MATCHES "^(Intel|GNU)$")
-  message(
-    WARNING "Compiler not officially supported: ${CMAKE_Fortran_COMPILER_ID}")
-endif()
 
 set(MOCSY_PRECISION 2 CACHE STRING "Precision to use (1 or 2)")
 set(CUSTOM_COMPILE_FLAGS "" CACHE STRING "Extra compile flags for the MOCSY target (e.g., -O3 -fno-alias)")
