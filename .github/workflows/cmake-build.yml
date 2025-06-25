@@ -20,12 +20,12 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v4
-
-      - name: Install CMake
-        uses: jwlawson/actions-setup-cmake@v1
+      - name: Setup cmake
+        uses: jwlawson/actions-setup-cmake@v2
         with:
-          cmake-version: '3.27.9'
+          cmake-version: '3.16.x'
+      - name: Use cmake
+        run: cmake --version 
 
       - uses: fortran-lang/setup-fortran@v1
         id: setup-fortran
