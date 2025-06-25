@@ -1,10 +1,33 @@
 cmake_minimum_required(VERSION 3.22)
 project(MOCSY LANGUAGES Fortran VERSION 2024.08.1)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+if(NOT CMAKE_BUILD_TYPE MATCHES "^(Debug|Release|RelWithDebInfo|MinSizeRel)$")
+  message(STATUS "Setting build type to 'Relwithdebinfo' as none was specified.")
+  set(CMAKE_BUILD_TYPE
+      "Relwithdebinfo"
+      CACHE STRING "Choose the type of build." FORCE)
+  set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+else()
+  message(STATUS "Setting build type to ${CMAKE_BUILD_TYPE}")
+endif()
+
+if(NOT CMAKE_Fortran_COMPILER_ID MATCHES "^(Intel|GNU)$")
+  message(
+    WARNING "Compiler not officially supported: ${CMAKE_Fortran_COMPILER_ID}")
+endif()
+
 set(MOCSY_PRECISION 2 CACHE STRING "Precision to use (1 or 2)")
 set(CUSTOM_COMPILE_FLAGS "" CACHE STRING "Extra compile flags for the MOCSY target (e.g., -O3 -fno-alias)")
 add_library(MOCSY STATIC)
 option(MOCSY_PRECISION "Precision to use (1 or 2)" 2)
+
+
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+include(CheckFortranCompilerFlag)
+include(set_mocsy_compile_flags)
+
+configure_fortran_flags()
 
 set_target_properties(MOCSY PROPERTIES
   Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/mod
