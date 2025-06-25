@@ -35,8 +35,9 @@ jobs:
 
       - name: Check compiler
       - run: |
-          ${{ env.FC }} ... # environment vars FC, CC, and CXX are set
-          ${{ steps.setup-fortran.outputs.fc }} ... # outputs work too
+      echo "Compiler from env: $FC"
+      $FC --version
+      echo "Compiler from output: ${{ steps.setup-fortran.outputs.fc }}"
 
       - name: Execute cmake and build for ${{matrix.toolchain.compiler}}
         run: |
