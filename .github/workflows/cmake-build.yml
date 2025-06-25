@@ -3,38 +3,45 @@ name: Test cmake build
 on: [push]
 
 jobs:
-  test_conda:
-    name: Build testing with ${{ matrix.compiler }}  on ${{ matrix.os }}
+  test:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        # mpi on windows is a nightmare
-        os: ["ubuntu-latest"]
-        compiler: ["gfortran", "ifx_linux-64", "flang"]
+        os: [ubuntu-latest]
+        toolchain:
+          - {compiler: gcc, version: 13}
+          - {compiler: intel, version: '2025.0'}
+          - {compiler: intel-classic, version: '2021.10'}
+          - {compiler: nvidia-hpc, version: '25.1'}
+        include:
+          - os: ubuntu-latest
+            toolchain: {compiler: gcc, version: 12}
+
     steps:
+
       - uses: actions/checkout@v4
-      - uses: conda-incubator/setup-miniconda@v3
+
+      - name: Install CMake
+        uses: jwlawson/actions-setup-cmake@v1
         with:
-          auto-update-conda: true
-          python-version: ${{ matrix.python-version }}
-          miniforge-version: latest
+          cmake-version: '3.27.9'
 
-      - name: Install Our own environment
-        shell: bash -el {0}
-        run: |
-          conda env create --name mocsy-access-nri --file no_compiler_env.yml
+      - uses: fortran-lang/setup-fortran@v1
+        id: setup-fortran
+        with:
+          compiler: ${{ matrix.toolchain.compiler }}
+          version: ${{ matrix.toolchain.version }}
 
-      - name: Install our own compiler using conda
-        shell: bash -el {0}
-        run: |
-          conda install -c conda-forge -n mocsy-access-nri ${{matrix.compiler}}
+      - name: Check compiler
+      - run: |
+          ${{ env.FC }} ... # environment vars FC, CC, and CXX are set
+          ${{ steps.setup-fortran.outputs.fc }} ... # outputs work too
 
-      - name: Execute cmake and build for ${{matrix.compiler}}
-        shell: bash -el {0}
+      - name: Execute cmake and build for ${{matrix.toolchain.compiler}}
         run: |
-          conda activate mocsy-access-nri
-          export FC=${{matrix.compiler}}
           cmake -B build
           cmake --build build
+
+
 
