@@ -19,6 +19,7 @@ jobs:
             toolchain: {compiler: gcc, version: 12}
 
     steps:
+      - uses: actions/checkout@v4
       - name: Setup cmake
         uses: jwlawson/actions-setup-cmake@v2
         with:
@@ -42,6 +43,6 @@ jobs:
 
       - name: Execute cmake and build for ${{ matrix.toolchain.compiler }}
         run: |
-          cmake -B build
+          cmake -S $GITHUB_WORKSPACE -B build
           cmake --build build
 
