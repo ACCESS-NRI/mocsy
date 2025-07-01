@@ -21,7 +21,6 @@ option(MOCSY_PRECISION "Precision to use (1 or 2)" 2)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 include(CheckFortranCompilerFlag)
-include(set_mocsy_compile_flags)
 
   if("${CMAKE_Fortran_COMPILER_ID}" STREQUAL "GNU")
 
