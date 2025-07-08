@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(MOCSY LANGUAGES Fortran VERSION 2024.08.1)
+project(mocsy LANGUAGES Fortran VERSION 2024.08.1)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 if(NOT CMAKE_BUILD_TYPE MATCHES "^(Debug|Release|RelWithDebInfo|MinSizeRel)$")
@@ -13,10 +13,10 @@ else()
 endif()
 
 
-set(MOCSY_PRECISION 2 CACHE STRING "Precision to use (1 or 2)")
-set(CUSTOM_COMPILE_FLAGS "" CACHE STRING "Extra compile flags for the MOCSY target (e.g., -O3 -fno-alias)")
-add_library(MOCSY STATIC)
-option(MOCSY_PRECISION "Precision to use (1 or 2)" 2)
+set(mocsy_PRECISION 2 CACHE STRING "Precision to use (1 or 2)")
+set(CUSTOM_COMPILE_FLAGS "" CACHE STRING "Extra compile flags for the mocsy target (e.g., -O3 -fno-alias)")
+add_library(mocsy STATIC)
+option(mocsy_PRECISION "Precision to use (1 or 2)" 2)
 
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
@@ -68,22 +68,22 @@ endif()
   message(STATUS "The ${CMAKE_BUILD_TYPE} Fortran flags are: ${flags_to_print}")
 
 
-set_target_properties(MOCSY PROPERTIES
+set_target_properties(mocsy PROPERTIES
   Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/mod
   OUTPUT_NAME mocsy
 )
 
-target_compile_definitions(MOCSY PRIVATE USE_PRECISION=${MOCSY_PRECISION}) 
+target_compile_definitions(mocsy PRIVATE USE_PRECISION=${mocsy_PRECISION}) 
 
 # Apply custom flags if provided
 if(CUSTOM_COMPILE_FLAGS)
   separate_arguments(CUSTOM_COMPILE_FLAGS)
   message(STATUS "Using ${CUSTOM_COMPILE_FLAGS} to compile !")
-  target_compile_options(MOCSY PRIVATE ${CUSTOM_COMPILE_FLAGS})
+  target_compile_options(mocsy PRIVATE ${CUSTOM_COMPILE_FLAGS})
 endif()
 
 
-target_include_directories(MOCSY PUBLIC
+target_include_directories(mocsy PUBLIC
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/mod>
   $<INSTALL_INTERFACE:include>
 )
@@ -97,7 +97,7 @@ configure_file(
 )
 
 
-install(TARGETS MOCSY
+install(TARGETS mocsy
   EXPORT mocsyTargets
   ARCHIVE DESTINATION lib
 )
@@ -114,34 +114,34 @@ install(DIRECTORY ${CMAKE_BINARY_DIR}/mod/
 
 install(EXPORT mocsyTargets
   FILE mocsyTargets.cmake
-  NAMESPACE MOCSY::
+  NAMESPACE mocsy::
   DESTINATION lib/cmake/mocsy
 )
 
 include(CMakePackageConfigHelpers)
 
 configure_package_config_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/MOCSYConfig.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/MOCSYConfig.cmake"
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/mocsyConfig.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/mocsyConfig.cmake"
   INSTALL_DESTINATION lib/cmake/mocsy
 )
 
 write_basic_package_version_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/MOCSYConfigVersion.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/mocsyConfigVersion.cmake"
   VERSION ${PROJECT_VERSION}
   COMPATIBILITY AnyNewerVersion
 )
 
 
 install(FILES
-  "${CMAKE_CURRENT_BINARY_DIR}/MOCSYConfig.cmake"
-  "${CMAKE_CURRENT_BINARY_DIR}/MOCSYConfigVersion.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/mocsyConfig.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/mocsyConfigVersion.cmake"
   DESTINATION lib/cmake/mocsy
 )
 
 install(FILES
-  "${CMAKE_CURRENT_BINARY_DIR}/MOCSYConfig.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/mocsyConfig.cmake"
   DESTINATION lib/cmake/mocsy
-  RENAME MOCSY-config.cmake
+  RENAME mocsy-config.cmake
 )
 
