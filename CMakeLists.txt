@@ -13,10 +13,10 @@ else()
 endif()
 
 
-set(mocsy_PRECISION 2 CACHE STRING "Precision to use (1 or 2)")
+set(MOCSY_PRECISION 2 CACHE STRING "Precision to use (1 or 2)")
 set(CUSTOM_COMPILE_FLAGS "" CACHE STRING "Extra compile flags for the mocsy target (e.g., -O3 -fno-alias)")
 add_library(mocsy STATIC)
-option(mocsy_PRECISION "Precision to use (1 or 2)" 2)
+option(MOCSY_PRECISION "Precision to use (1 or 2)" 2)
 
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
@@ -73,7 +73,7 @@ set_target_properties(mocsy PROPERTIES
   OUTPUT_NAME mocsy
 )
 
-target_compile_definitions(mocsy PRIVATE USE_PRECISION=${mocsy_PRECISION}) 
+target_compile_definitions(mocsy PRIVATE USE_PRECISION=${MOCSY_PRECISION}) 
 
 # Apply custom flags if provided
 if(CUSTOM_COMPILE_FLAGS)
@@ -98,7 +98,7 @@ configure_file(
 
 
 install(TARGETS mocsy
-  EXPORT mocsyTargets
+  EXPORT mocsy-targets
   ARCHIVE DESTINATION lib
 )
 
@@ -112,8 +112,8 @@ install(DIRECTORY ${CMAKE_BINARY_DIR}/mod/
   FILES_MATCHING PATTERN "*.mod"
 )
 
-install(EXPORT mocsyTargets
-  FILE mocsyTargets.cmake
+install(EXPORT mocsy-targets
+  FILE mocsy-targets.cmake
   NAMESPACE mocsy::
   DESTINATION lib/cmake/mocsy
 )
@@ -121,27 +121,22 @@ install(EXPORT mocsyTargets
 include(CMakePackageConfigHelpers)
 
 configure_package_config_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/mocsyConfig.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/mocsyConfig.cmake"
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/mocsy-config.cmake.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/mocsy-config.cmake"
   INSTALL_DESTINATION lib/cmake/mocsy
 )
 
 write_basic_package_version_file(
-  "${CMAKE_CURRENT_BINARY_DIR}/mocsyConfigVersion.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/mocsy-configVersion.cmake"
   VERSION ${PROJECT_VERSION}
   COMPATIBILITY AnyNewerVersion
 )
 
 
 install(FILES
-  "${CMAKE_CURRENT_BINARY_DIR}/mocsyConfig.cmake"
-  "${CMAKE_CURRENT_BINARY_DIR}/mocsyConfigVersion.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/mocsy-config.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/mocsy-configVersion.cmake"
   DESTINATION lib/cmake/mocsy
 )
 
-install(FILES
-  "${CMAKE_CURRENT_BINARY_DIR}/mocsyConfig.cmake"
-  DESTINATION lib/cmake/mocsy
-  RENAME mocsy-config.cmake
-)
 
