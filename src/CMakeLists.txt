@@ -1,4 +1,4 @@
-target_sources(MOCSY PRIVATE
+target_sources(mocsy PRIVATE
           mocsy_DNAD.F90
           mocsy_singledouble.F90 
           mocsy_sw_adtg.F90 
