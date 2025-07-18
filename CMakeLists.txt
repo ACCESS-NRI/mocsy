@@ -15,9 +15,8 @@ endif()
 
 set(MOCSY_PRECISION 2 CACHE STRING "Precision to use (1 or 2)")
 set(CUSTOM_COMPILE_FLAGS "" CACHE STRING "Extra compile flags for the mocsy target (e.g., -O3 -fno-alias)")
-add_library(mocsy STATIC)
 option(MOCSY_PRECISION "Precision to use (1 or 2)" 2)
-
+option(BUILD_SHARED_LIBS "Build shared/dynamic libraries" OFF)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
 include(CheckFortranCompilerFlag)
@@ -68,9 +67,12 @@ endif()
   message(STATUS "The ${CMAKE_BUILD_TYPE} Fortran flags are: ${flags_to_print}")
 
 
+add_library(mocsy)
+
 set_target_properties(mocsy PROPERTIES
   Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/mod
   OUTPUT_NAME mocsy
+  POSITION_INDEPENDENT_CODE ${BUILD_SHARED_LIBS}
 )
 
 target_compile_definitions(mocsy PRIVATE USE_PRECISION=${MOCSY_PRECISION}) 
