@@ -1,7 +1,12 @@
 cmake_minimum_required(VERSION 3.22)
-project(mocsy LANGUAGES Fortran VERSION 2024.08.1)
+project(mocsy
+  DESCRIPTION "Routines to model ocean carbonate system thermodynamics."
+  LANGUAGES Fortran
+  VERSION 2025.08.0)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+include(CheckFortranCompilerFlag)
+include(CMakePackageConfigHelpers)
+
 if(NOT CMAKE_BUILD_TYPE MATCHES "^(Debug|Release|RelWithDebInfo|MinSizeRel)$")
   message(STATUS "Setting build type to 'Relwithdebinfo' as none was specified.")
   set(CMAKE_BUILD_TYPE
@@ -12,39 +17,32 @@ else()
   message(STATUS "Setting build type to ${CMAKE_BUILD_TYPE}")
 endif()
 
-
 set(MOCSY_PRECISION 2 CACHE STRING "Precision to use (1 or 2)")
-set(CUSTOM_COMPILE_FLAGS "" CACHE STRING "Extra compile flags for the mocsy target (e.g., -O3 -fno-alias)")
 option(MOCSY_PRECISION "Precision to use (1 or 2)" 2)
 option(BUILD_SHARED_LIBS "Build shared/dynamic libraries" OFF)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
-include(CheckFortranCompilerFlag)
 
-  if("${CMAKE_Fortran_COMPILER_ID}" STREQUAL "GNU")
+################################################################################
 
-    message(STATUS "Configuring Fortran flags for GNU")
+if("${CMAKE_Fortran_COMPILER_ID}" STREQUAL "GNU")
 
-    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fcray-pointer -ffree-line-length-none -fno-range-check -Waliasing -Wampersand -Warray-bounds -Wcharacter-truncation -Wconversion -Wline-truncation -Wintrinsics-std -Wno-tabs -Wunderflow -Wunused-parameter -Wintrinsic-shadow -Wno-align-commons -Wsurprising")
+  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fcray-pointer -ffree-line-length-none -fno-range-check -Waliasing -Wampersand -Warray-bounds -Wcharacter-truncation -Wconversion -Wline-truncation -Wintrinsics-std -Wno-tabs -Wunderflow -Wunused-parameter -Wintrinsic-shadow -Wno-align-commons -Wsurprising")
 
-include(CheckFortranCompilerFlag)
-check_fortran_compiler_flag("-fallow-invalid-boz" _boz_flag)
-check_fortran_compiler_flag("-fallow-argument-mismatch" _argmis_flag)
+  check_fortran_compiler_flag("-fallow-invalid-boz" _boz_flag)
+  check_fortran_compiler_flag("-fallow-argument-mismatch" _argmis_flag)
+  if(_boz_flag)
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fallow-invalid-boz")
+  endif()
+  if(_argmis_flag)
+    set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fallow-argument-mismatch")
+  endif()
 
-if(_boz_flag)
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fallow-invalid-boz")
-endif()
-if(_argmis_flag)
-  set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fallow-argument-mismatch")
-endif()
-
-set(CMAKE_Fortran_FLAGS_RELEASE "-O2")
-set(CMAKE_Fortran_FLAGS_RELWITHDEBINFO "-g")
-set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -g -W -fbounds-check")
+  set(CMAKE_Fortran_FLAGS_RELEASE "-O2")
+  set(CMAKE_Fortran_FLAGS_RELWITHDEBINFO "-g")
+  set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -g -W -fbounds-check")
 
 elseif("${CMAKE_Fortran_COMPILER_ID}" STREQUAL "INTEL" OR "${CMAKE_Fortran_COMPILER_ID}" STREQUAL "IntelLLVM")
-
-  message(STATUS "Configuring Fortran flags for Intel/IntelLLVM")
 
   set(CMAKE_Fortran_FLAGS "${CMAKE_Fortran_FLAGS} -fno-alias -safe-cray-ptr -fpe0 -ftz -assume byterecl -i4 -traceback -nowarn -check noarg_temp_created -assume nobuffered_io -convert big_endian -grecord-gcc-switches -fp-model precise -fp-model source -align all")
   set(CMAKE_Fortran_FLAGS_RELEASE "-g3 -O2 -xCORE-AVX2 -debug all -check none")
@@ -52,22 +50,14 @@ elseif("${CMAKE_Fortran_COMPILER_ID}" STREQUAL "INTEL" OR "${CMAKE_Fortran_COMPI
   set(CMAKE_Fortran_FLAGS_DEBUG "-g3 -O0 -debug all -check -check noarg_temp_created -check nopointer -warn -warn noerrors -ftrapuv")
 
 else()
-  message(WARNING "Fortran compiler with ID '${CMAKE_Fortran_COMPILER_ID}' will be used with default flags")
+  message(WARNING "Unsupported Fortran compiler with ID '${CMAKE_Fortran_COMPILER_ID}' will be used with default flags")
 endif()
 
-  message(STATUS "CMAKE_Fortran_FLAGS = ${CMAKE_Fortran_FLAGS}")
-  string(TOUPPER "${CMAKE_BUILD_TYPE}" _build_type)
-  if(_build_type STREQUAL "RELEASE")
-  set(flags_to_print ${CMAKE_Fortran_FLAGS_RELEASE})
-  elseif(_build_type STREQUAL "DEBUG")
-  set(flags_to_print ${CMAKE_Fortran_FLAGS_DEBUG})
-  elseif(_build_type STREQUAL "RELWITHDEBINFO")
-  set(flags_to_print ${CMAKE_Fortran_FLAGS_RELWITHDEBINFO})
-  endif()
-  message(STATUS "The ${CMAKE_BUILD_TYPE} Fortran flags are: ${flags_to_print}")
-
+################################################################################
 
 add_library(mocsy)
+
+add_subdirectory(src)
 
 set_target_properties(mocsy PROPERTIES
   Fortran_MODULE_DIRECTORY ${CMAKE_BINARY_DIR}/mod
@@ -77,37 +67,15 @@ set_target_properties(mocsy PROPERTIES
 
 target_compile_definitions(mocsy PRIVATE USE_PRECISION=${MOCSY_PRECISION}) 
 
-# Apply custom flags if provided
-if(CUSTOM_COMPILE_FLAGS)
-  separate_arguments(CUSTOM_COMPILE_FLAGS)
-  message(STATUS "Using ${CUSTOM_COMPILE_FLAGS} to compile !")
-  target_compile_options(mocsy PRIVATE ${CUSTOM_COMPILE_FLAGS})
-endif()
-
-
 target_include_directories(mocsy PUBLIC
   $<BUILD_INTERFACE:${CMAKE_BINARY_DIR}/mod>
   $<INSTALL_INTERFACE:include>
 )
 
-add_subdirectory(src)
-
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/mocsy.pc.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/mocsy.pc"
-  @ONLY
-)
-
-
 install(TARGETS mocsy
   EXPORT mocsy-targets
   ARCHIVE DESTINATION lib
 )
-
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mocsy.pc"
-  DESTINATION lib/pkgconfig
-)
-
 
 install(DIRECTORY ${CMAKE_BINARY_DIR}/mod/
   DESTINATION include
@@ -120,8 +88,7 @@ install(EXPORT mocsy-targets
   DESTINATION lib/cmake/mocsy
 )
 
-include(CMakePackageConfigHelpers)
-
+# Configure/install CMake package config and version file
 configure_package_config_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/cmake/mocsy-config.cmake.in"
   "${CMAKE_CURRENT_BINARY_DIR}/mocsy-config.cmake"
@@ -134,11 +101,19 @@ write_basic_package_version_file(
   COMPATIBILITY AnyNewerVersion
 )
 
-
 install(FILES
   "${CMAKE_CURRENT_BINARY_DIR}/mocsy-config.cmake"
   "${CMAKE_CURRENT_BINARY_DIR}/mocsy-config-version.cmake"
   DESTINATION lib/cmake/mocsy
 )
 
+# Configure/install pkgconfig file
+configure_file(
+  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/mocsy.pc.in"
+  "${CMAKE_CURRENT_BINARY_DIR}/mocsy.pc"
+  @ONLY
+)
 
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/mocsy.pc"
+  DESTINATION lib/pkgconfig
+)
