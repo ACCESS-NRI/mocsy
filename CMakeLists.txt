@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 project(mocsy
   DESCRIPTION "Routines to model ocean carbonate system thermodynamics."
   LANGUAGES Fortran
-  VERSION 2024.08.1)
+  VERSION 2025.08.0)
 
 include(CheckFortranCompilerFlag)
 include(CMakePackageConfigHelpers)
