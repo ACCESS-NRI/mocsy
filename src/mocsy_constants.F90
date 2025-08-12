@@ -435,7 +435,6 @@ SUBROUTINE constants(K0, K1, K2, Kb, Kw, Ks, Kf, Kspc, Kspa,  &
                 (148.0248d0 + 137.1942d0*sqrts + 1.62142d0*s) +   &
                 (-24.4344d0 - 25.085d0*sqrts - 0.2474d0*s) *      &
                 dlogtk + 0.053105d0*sqrts*tk)
-
 !       K1p = [H][H2PO4]/[H3PO4]
 !       (seawater scale)
 !       DOE(1994) eq 7.2.20 with footnote using data from Millero (1974)
@@ -496,8 +495,8 @@ SUBROUTINE constants(K0, K1, K2, Kb, Kw, Ks, Kf, Kspc, Kspa,  &
 !       Dickson (1990, J. chem. Thermodynamics 22, 113)
         Ks_0p = EXP(-4276.1d0*invtk + 141.328d0 - 23.093d0*dlogtk          &
                 + (-13856.d0*invtk + 324.57d0 - 47.986d0*dlogtk) * sqrtis  &
-                + (35474.d0*invtk - 771.54 + 114.723d0*dlogtk) * is      &
-                - 2698.d0*invtk*is**1.5 + 1776.d0*invtk*is2              &
+                + (35474.d0*invtk - 771.54d0 + 114.723d0*dlogtk) * is      &
+                - 2698.d0*invtk*is**1.5d0 + 1776.d0*invtk*is2              &
                 + LOG(1.0d0 - 0.001005d0*s))
 
 !       Kf = [H][F]/[HF]
@@ -515,6 +514,7 @@ SUBROUTINE constants(K0, K1, K2, Kb, Kw, Ks, Kf, Kspc, Kspa,  &
            PRINT *, "optKf must be either 'dg' or 'pf'"
            STOP
         ENDIF
+
 
 !       Kspc (calcite) - apparent solubility product of calcite
 !       (no scale)
@@ -547,7 +547,7 @@ SUBROUTINE constants(K0, K1, K2, Kb, Kw, Ks, Kf, Kspc, Kspa,  &
            deltav(ipc)  =  a0(ipc) + a1(ipc) *t + a2(ipc) *t*t
            deltak(ipc)   = (b0(ipc)  + b1(ipc) *t + b2(ipc) *t*t)
            lnkpok0(ipc)  = (-(deltav(ipc)) &
-                +(0.5d0*deltak(ipc) * prb) &
+                +(0.5_r8*deltak(ipc) * prb) &
                 )                         * prb/(R*tk)
         END DO
 
