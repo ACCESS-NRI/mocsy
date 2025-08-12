@@ -2,7 +2,6 @@ program pic_tester
    use, intrinsic :: iso_fortran_env, only: error_unit
    use testdrive, only: run_testsuite, new_testsuite, testsuite_type, &
    & select_suite, run_selected, get_argument
-   use test_suite1, only: collect_suite1
    use test_mocsy, only: collect_mocsy_suite
    implicit none
    integer :: stat, is
@@ -15,7 +14,6 @@ program pic_tester
    stat = 0
    !allocate (testsuites(ntest_suites))
    testsuites = [ &
-                new_testsuite("base_utils", collect_suite1), &
                 new_testsuite("mocsy", collect_mocsy_suite) &
                 ]
    ! here you add another test suite to the array
