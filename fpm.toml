@@ -1,0 +1,83 @@
+name = "mocsy"
+version = "0.1.0"
+license = "MIT"
+author = "ACCESS-NRI"
+maintainer = "jorgegalvez1694@gmail.com"
+copyright = "Copyright 2024, MOCSY?"
+[preprocess]
+[preprocess.cpp]
+suffixes = ["F90", "f90"]
+macros = ["PRECISION=2"]
+[library]
+source-dir = "src"
+
+[[executable]]
+name = "constants"
+source-dir = "examples"
+main = "test_mocsy.F90"
+
+[[executable]]
+name = "kzero"
+source-dir = "examples"
+main = "test_kzero.F90"
+
+#[[executable]]
+#name = "buffesm"
+#source-dir = "examples"
+#main = "test_buffesm.F90"
+
+[[executable]]
+name = "derivauto"
+source-dir = "examples"
+main = "test_derivauto.F90"
+
+[[executable]]
+name = "derivnum"
+source-dir = "examples"
+main = "test_derivnum.F90"
+
+[[executable]]
+name = "errors"
+source-dir = "examples"
+main = "test_errors.F90"
+
+[[executable]]
+name = "kprime"
+source-dir = "examples"
+main = "test_kprime.F90"
+
+[[executable]]
+name = "phizero"
+source-dir = "examples"
+main = "test_phizero.F90"
+
+[[executable]]
+name = "vars"
+source-dir = "examples"
+main = "test_vars.F90"
+
+[build]
+auto-executables = false 
+auto-tests = false
+auto-examples = false 
+module-naming = false
+[[test]]
+name = "mocsy_tests"
+source-dir = "test-suite"
+main = "main_tests.f90"
+[install]
+library = true
+
+[fortran]
+implicit-typing = true
+implicit-external = true
+source-form = "free"
+
+[dependencies]
+test-drive.git = "https://github.com/fortran-lang/test-drive"
+pic = { git = "https://github.com/JorgeG94/pic.git", branch = "main"}
+[extra.fortitude.check]
+select = ["C", "E", "S"]
+ignore = ["C003"]
+line-length = 132
+per-file-ignores = { "pic_blas_interfaces.F90" = ["C071"] }
