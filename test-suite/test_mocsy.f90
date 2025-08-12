@@ -19,7 +19,8 @@ subroutine collect_mocsy_suite(testsuite)
   testsuite = [ & 
     new_unittest("constants", test_constants), & 
     new_unittest("kzero", test_kzero), &
-    new_unittest("derivauto", test_derivauto) &
+    new_unittest("derivauto", test_derivauto), &
+    new_unittest("derivnum", test_derivnum) &
   ]
 
 end subroutine collect_mocsy_suite
@@ -392,4 +393,165 @@ real(r8), parameter :: omegac_deriv_ref(6) = [ &
 
 end subroutine test_derivauto
 
+subroutine test_derivnum(error)
+   USE mocsy_derivnum
+    type(error_type), allocatable, intent(out) :: error 
+
+
+
+!  Output variables:
+   REAL(kind=rx), DIMENSION(1) :: h, ph, pco2, fco2, co2, hco3, co3, OmegaA, OmegaC, BetaD, rhoSW, p, tempis
+!  derivative of "vars" Output variables:
+   REAL(kind=rx), DIMENSION(1) :: dh_dx, dpco2_dx, dfco2_dx, dco2_dx, dhco3_dx, dco3_dx, dOmegaA_dx, dOmegaC_dx
+!  Input variables
+   REAL(kind=rx), DIMENSION(1) :: temp, sal, alk, dic, sil, phos, Patm, depth, lat
+!  Input options
+   CHARACTER(10) :: optCON, optT, optP, optB, optKf, optK1K2
+   real(r8), dimension(13) :: h_deriv, pco2_deriv, fco2_deriv, co2_deriv, &
+                     hco3_deriv, co3_deriv, omegaa_deriv, omegac_deriv
+! Parameter arrays for numerical derivative correctness checking
+real(r8), parameter :: H_deriv_num_ref(13) = [ &
+    -0.000027370454_r8, 0.000030411615_r8, 0.000031863739_r8, &
+    0.000001062092_r8, 0.000000000257_r8, 0.000000000212_r8, &
+    0.000000000000_r8, 0.000245914416_r8, 5.781185150146_r8, &
+    0.937451243401_r8, 3658.276123046875_r8, 0.000000000000_r8, &
+    0.000000000000_r8 ]
+
+real(r8), parameter :: pco2_deriv_num_ref(13) = [ &
+    -1218969.625000000000_r8, 1485482.625000000000_r8, 1373305.500000000000_r8, &
+    49844.394531250000_r8, 12.830508232117_r8, 8.357298851013_r8, &
+    -8994.158203125000_r8, -238075264.000000000000_r8, 231731363840.000000000000_r8, &
+    43654672384.000000000000_r8, 167346404589568.000000000000_r8, 0.000000000000_r8, &
+    0.000000000000_r8 ]
+
+real(r8), parameter :: fco2_deriv_num_ref(13) = [ &
+    -1212416.000000000000_r8, 1478200.875000000000_r8, 1365676.125000000000_r8, &
+    49590.085937500000_r8, 12.796609878540_r8, 8.326797485352_r8, &
+    -8962.743164062500_r8, -237248736.000000000000_r8, 230940852224.000000000000_r8, &
+    43502084096.000000000000_r8, 166846108008448.000000000000_r8, 0.000000000000_r8, &
+    0.000000000000_r8 ]
+
+real(r8), parameter :: co2_deriv_num_ref(13) = [ &
+    -0.041406251490_r8, 0.050781250000_r8, 0.046839471906_r8, &
+    0.001697689877_r8, 0.000000136384_r8, 0.000000227770_r8, &
+    0.000000000000_r8, -8.134672164917_r8, 7918.082519531250_r8, &
+    1491.787963867188_r8, 5710434.000000000000_r8, 0.000000000000_r8, &
+    0.000000000000_r8 ]
+
+real(r8), parameter :: hco3_deriv_num_ref(13) = [ &
+    -0.625000000000_r8, 1.583333373070_r8, 0.698499321938_r8, &
+    0.026192929596_r8, -0.000000549575_r8, 0.000000947441_r8, &
+    0.000000000000_r8, 13.533281326294_r8, -81210.203125000000_r8, &
+    22368.375000000000_r8, 85880160.000000000000_r8, 0.000000000000_r8, &
+    0.000000000000_r8 ]
+
+real(r8), parameter :: co3_deriv_num_ref(13) = [ &
+    0.665624976158_r8, -0.628472208977_r8, -0.745793521404_r8, &
+    -0.027284301817_r8, 0.000000440468_r8, -0.000001161446_r8, &
+    0.000000000000_r8, -5.366018772125_r8, 73303.078125000000_r8, &
+    -23858.212890625000_r8, -91486224.000000000000_r8, 0.000000000000_r8, &
+    0.000000000000_r8 ]
+
+real(r8), parameter :: omegaa_deriv_num_ref(13) = [ &
+    10240.000000000000_r8, -9671.111328125000_r8, -11563.423828125000_r8, &
+    -421.197845458984_r8, 0.016816737130_r8, -0.035811547190_r8, &
+    0.000000000000_r8, -82850.460937500000_r8, 1131913728.000000000000_r8, &
+    -368413504.000000000000_r8, -1412923260928.000000000000_r8, -4748266.000000000000_r8, &
+    0.000000000000_r8 ]
+
+real(r8), parameter :: omegac_deriv_num_ref(13) = [ &
+    15872.000000000000_r8, -15018.666992187500_r8, -17881.582031250000_r8, &
+    -651.664611816406_r8, 0.014036016539_r8, -0.062908500433_r8, &
+    0.000000000000_r8, -128149.984375000000_r8, 1750222080.000000000000_r8, &
+    -569706880.000000000000_r8, -2184852275200.000000000000_r8, 0.000000000000_r8, &
+    -11354823.000000000000_r8 ]
+
+!  Local variables:
+   CHARACTER*3, DIMENSION(13) ::  devar = (/'alk','dic','pho','sil','tem','sal','k0 ','k1 ','k2 ','kb ','kw ','ka ','kc '/)
+   INTEGER ::  i
+   
+  !     derivar = 3-character identifier of input variable with respect to which derivative is requested
+  !               possibilities are 'alk', 'dic', 'pho', 'sil', 'tem', or 'sal'
+  !
+
+!> Typical options for observations
+   optCON  = 'mol/kg'  ! input concentrations are in MOL/KG
+   optT    = 'Tinsitu' ! input temperature, variable 'temp' is actually IN SITU temp [°C]
+   optP    = 'db'       ! input variable 'depth' is in meters
+   optB    = 'l10'
+   optK1K2 = 'l'
+   optKf   = 'dg'
+!> Simple input data (with CONCENTRATION units typical for DATA)
+!> (based on observed average surface concentrations from S. Ocean (south of 60°S)--GLODAP and WOA2009)
+    temp(1)   = 18.0d0            !Can be "Potential temperature" or "In situ temperature" (see optT below)
+    sal(1)    = 35.0d0           !Salinity (practical scale)
+    alk(1)    = 2300.0d-6      ! Convert obs. S. Ocean ave surf ALK (umol/kg) to mocsy data units (mol/kg)
+    dic(1)    = 2000.0d-6      ! Convert obs. S. Ocean ave surf DIC (umol/kg) to mocsy data units (mol/kg)
+    sil(1)    = 0.0d0   ! 60.d-06
+    phos(1)   = 0.0d0   !  2.d-06
+    sil(1)    = 60.0d-6   ! 60.d-06
+    phos(1)   =  2.0d-6   !  2.d-06
+    depth(1)  = 0.d0
+    Patm(1)   = 1.0d0            !Atmospheric pressure (atm)
+    lat(1)    = 0.d0
+
+!  Select input var 'x', choosing set of dy_i/dx to be computed, where y_i are the diff output vars
+   call vars(ph, pco2, fco2, co2, hco3, co3, OmegaA, OmegaC, BetaD, rhoSW, p, tempis,         &  ! OUTPUT
+             temp, sal, alk, dic, sil, phos, Patm, depth, lat, 1,                             &  ! INPUT
+             optCON, optT, optP, optB=optB, optK1K2=optK1K2, optKf=optKf,                     &
+             optGAS='Ppot'    )
+   h(1) = 10**(- ph(1))
+
+!    write (*,*) "Variables:"
+!    write (*,*) "          h,           ph,         pco2,         fco2,           co2",&
+!               "           hco3,           co3,         OmegaA,         OmegaC"
+!    write (*,"(9ES15.6)")  h, ph, pco2, fco2, co2, hco3, co3, OmegaA, OmegaC
+
+!    write (*,*) "Absolute derivatives" 
+!    write (*,*) "             dh_dx         dpco2_dx       dfco2_dx         dco2_dx      dhco3_dx       dco3_dx", &
+!         "       dOmegaA_dx     dOmegaC_dx"
+
+   do i = 1,13
+      call derivnum (dh_dx, dpco2_dx, dfco2_dx, dco2_dx, dhco3_dx,                      &
+                      dco3_dx, dOmegaA_dx, dOmegaC_dx,                                   &
+                      temp, sal, alk, dic, sil, phos, Patm, depth, lat, 1, devar(i),     &
+                      optCON, optT, optP, optB=optB, optK1K2=optK1K2, optKf=optKf          )
+      H_deriv(i) = dh_dx(1)
+      pco2_deriv(i) = dpco2_dx(1)
+      fco2_deriv(i) = dfco2_dx(1)
+      co2_deriv(i) = dco2_dx(1)
+      hco3_deriv(i) = dhco3_dx(1)
+      co3_deriv(i) = dco3_dx(1)
+      omegaa_deriv(i) = dOmegaA_dx(1)
+      omegac_deriv(i) = dOmegaC_dx(1)
+    !   write (*,"(A3,A5,8ES15.6)")  devar(i), "  :  ", dh_dx(1), dpco2_dx(1), dfco2_dx(1), dco2_dx(1), dhco3_dx(1), dco3_dx(1), &
+    !       dOmegaA_dx(1), dOmegaC_dx(1)
+   end do
+
+
+   call check(error, all(is_equal(H_deriv, H_deriv_num_ref)), .true., " H deriv does not match!")
+   if(allocated(error)) return
+
+   call check(error, all(is_equal(pco2_deriv, pco2_deriv_num_ref)), .true., " pCO2 deriv does not match!")
+   if(allocated(error)) return
+
+   call check(error, all(is_equal(fco2_deriv, fco2_deriv_num_ref)), .true., " fCO2 deriv does not match!")
+   if(allocated(error)) return
+
+   call check(error, all(is_equal(co2_deriv, co2_deriv_num_ref)), .true., " CO2 deriv does not match!")
+   if(allocated(error)) return
+
+   call check(error, all(is_equal(hco3_deriv, hco3_deriv_num_ref)), .true., " HCO3 deriv does not match!")
+   if(allocated(error)) return
+
+   call check(error, all(is_equal(co3_deriv, co3_deriv_num_ref)), .true., " CO3 deriv does not match!")
+   if(allocated(error)) return
+
+   call check(error, all(is_equal(omegaa_deriv, omegaa_deriv_num_ref)), .true., " OmegaA deriv does not match!")
+   if(allocated(error)) return
+
+   call check(error, all(is_equal(omegac_deriv, omegac_deriv_num_ref)), .true., " OmegaC deriv does not match!")
+   if(allocated(error)) return
+
+end subroutine test_derivnum
 end module test_mocsy
