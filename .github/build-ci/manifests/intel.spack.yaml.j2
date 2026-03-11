@@ -3,9 +3,13 @@ spack:
   # *_compiler is defined in the .github/build-ci/data/standard.json file
   - access-mocsy@git.{{ ref }}
   packages:
+    intel-oneapi-compiler-classic:
+      require:
+      - '@{{ intel_compiler_version }}'
     all:
       require:
-      - '%{{ intel_compiler }} target=x86_64'
+      - '%access_intel'
+      - 'target=x86_64'
   concretizer:
     unify: false
   view: false
