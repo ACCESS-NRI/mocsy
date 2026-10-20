@@ -33,6 +33,5 @@ jobs:
       spack-manifest-path: ${{ matrix.file }}
       allow-ssh-into-spack-install: false  # If true, PR author must ssh into instance to complete job
       enable-pytest: true
-      pytest-search-path: test
       pytest-requirements-path: requirements.txt
       # More args, including setting spack/spack-config refs, can be found in https://github.com/ACCESS-NRI/build-ci/blob/v4/.github/workflows/README.md
