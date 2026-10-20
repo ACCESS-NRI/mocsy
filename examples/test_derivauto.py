@@ -40,11 +40,11 @@ invar = ['alk', 'dic', 'pho', 'sil', 'tem', 'sal']
 
 # output results
 #print "      dH/dx         dpCO2/dx       dfCO2/dx       d[CO2*]/dx      d[HCO3-]/dx    d[CO3--]/dx     dOmegaA/dx     dOmegaC/dx"
-print "derivauto: Absolute derivatives" 
-print "             dh_dx         dpco2_dx       dfco2_dx         dco2_dx      dhco3_dx       dco3_dx       dOmegaA_dx     dOmegaC_dx"
+print("derivauto: Absolute derivatives")
+print("             dh_dx         dpco2_dx       dfco2_dx         dco2_dx      dhco3_dx       dco3_dx       dOmegaA_dx     dOmegaC_dx")
 for i in range(6):
-       print "%3s  :  %14.6e %14.6e %14.6e %14.6e %14.6e %14.6e %14.6e %14.6e" %  \
-       (invar[i], H_deriv[i,0], pco2_deriv[i,0], fco2_deriv[i,0], co2_deriv[i,0], hco3_deriv[i,0], co3_deriv[i,0], omegaa_deriv[i,0], omegac_deriv[i,0])
+       print("%3s  :  %14.6e %14.6e %14.6e %14.6e %14.6e %14.6e %14.6e %14.6e" %  \
+       (invar[i], H_deriv[i,0], pco2_deriv[i,0], fco2_deriv[i,0], co2_deriv[i,0], hco3_deriv[i,0], co3_deriv[i,0], omegaa_deriv[i,0], omegac_deriv[i,0]))
        # print invar[i], H_deriv[i,0], pco2_deriv[i,0], fco2_deriv[i,0], co2_deriv[i,0], hco3_deriv[i,0], co3_deriv[i,0], omegaa_deriv[i,0], omegac_deriv[i,0]
 
 # output results: another way 

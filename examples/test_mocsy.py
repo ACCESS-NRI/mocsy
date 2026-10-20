@@ -45,9 +45,9 @@ mocsy.mvars.vars (ph, pco2, fco2, co2, hco3, co3, OmegaA, OmegaC, BetaD, rhoSW, 
 # print mocsy results
 # -------------------
 
-print "pH     pCO2   fCO2     CO2*       HCO3-       CO32-      OmegaA OmegaC  R    Density Press  Temperature"
+print("pH     pCO2   fCO2     CO2*       HCO3-       CO32-      OmegaA OmegaC  R    Density Press  Temperature")
 for i in range (0, 6):
-    print ph[i], pco2[i], fco2[i], co2[i], hco3[i], co3[i], OmegaA[i], OmegaC[i], BetaD[i], rhoSW[i], p[i], tempis[i]
+    print(ph[i], pco2[i], fco2[i], co2[i], hco3[i], co3[i], OmegaA[i], OmegaC[i], BetaD[i], rhoSW[i], p[i], tempis[i])
 
 # Compute buffer factors from Egleston
 # pco2_deriv[2,:] are derivatives of pCO2 w/ respect to DIC
@@ -62,14 +62,14 @@ beta_Alk  = -1. / (np.log(10.) * ph_deriv[0,:])
 omega_DIC = OmegaA / OmegaA_deriv[1,:]
 omega_Alk = OmegaA / OmegaA_deriv[0,:]
 
-print ""
-print "gamma_DIC     gamma_Alk     beta_DIC     beta_Alk    omega_DIC    omega_Alk"
+print("")
+print("gamma_DIC     gamma_Alk     beta_DIC     beta_Alk    omega_DIC    omega_Alk")
 for i in range (0, 6):
-    print gamma_DIC[i], gamma_Alk[i], beta_DIC[i], beta_Alk[i], omega_DIC[i], omega_Alk[i]
+    print(gamma_DIC[i], gamma_Alk[i], beta_DIC[i], beta_Alk[i], omega_DIC[i], omega_Alk[i])
 
 # Print derivatives of pH with respect to phosphate, silicate, temperature and salinity
-print ""
-print "dpH/dPhos  dpH/dSil  dpH/dT   dpH/dS"
-print "pH/µMol     pH/µMol  pH/°C   pH/psu"
+print("")
+print("dpH/dPhos  dpH/dSil  dpH/dT   dpH/dS")
+print("pH/µMol     pH/µMol  pH/°C   pH/psu")
 for i in range (0, 6):
-    print ph_deriv[2,i], ph_deriv[3,i], ph_deriv[4,i], ph_deriv[5,i]
+    print(ph_deriv[2,i], ph_deriv[3,i], ph_deriv[4,i], ph_deriv[5,i])

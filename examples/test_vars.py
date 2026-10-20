@@ -79,7 +79,7 @@ mocsy.mvars.vars(ph,pco2,fco2,co2,hco3,co3,omegaa,omegac,betad,rhosw,p,tempis,te
                     sil=0,phos=0,patm=1,depth=0,lat=0,n=1,optcon="mol/kg",optt='Tinsitu',optp='db',
                     pco2_deriv=pco2_deriv )
 # Result OK
-print "pco2_deriv[1,0]", pco2_deriv[1,0]
+print("pco2_deriv[1,0]", pco2_deriv[1,0])
 
 # Call subroutine 'vars()' with all optionnal output parameters (xxx_deriv, yyy_deriv, ...)
 mocsy.mvars.vars(ph,pco2,fco2,co2,hco3,co3,omegaa,omegac,betad,rhosw,p,tempis,temp=20,sal=35,
@@ -89,5 +89,5 @@ mocsy.mvars.vars(ph,pco2,fco2,co2,hco3,co3,omegaa,omegac,betad,rhosw,p,tempis,te
                     hco3_deriv=hco3_deriv, co3_deriv=co3_deriv, omegaa_deriv=omegaa_deriv, omegac_deriv=omegac_deriv)
 
 # Result for pco2_deriv is wrong
-print "pco2_deriv[1,0]", pco2_deriv[1,0]
+print("pco2_deriv[1,0]", pco2_deriv[1,0])
 
